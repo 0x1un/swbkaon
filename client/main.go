@@ -2,6 +2,7 @@ package main
 
 import (
 	"io/ioutil"
+	"swbkaon/srmodel"
 
 	"github.com/gorilla/websocket"
 	"github.com/sirupsen/logrus"
@@ -15,14 +16,14 @@ func main() {
 	if err != nil {
 		logrus.Errorln(err)
 	}
-	data, err := ioutil.ReadFile("/home/aumujun/conf.json")
+	data, err := ioutil.ReadFile("../.gitignore")
 	if err != nil {
 		logrus.Fatal(err)
 	}
-	binMsg := make([]byte, 512+len(data))
-	copy(binMsg, []byte("conf.json"))
-	copy(binMsg[512:], data)
-	err = dial.WriteMessage(websocket.BinaryMessage, binMsg)
+	err = dial.WriteMessage(websocket.BinaryMessage, srmodel.WriteFile(
+		srmodel.File{
+		FileName: "conf.json",
+	}, data))
 	if err != nil {
 		logrus.Errorln(err)
 	}

@@ -3,6 +3,7 @@ package main
 import (
 	"io/ioutil"
 	"net/http"
+	"swbkaon/srmodel"
 	"time"
 
 	"github.com/gorilla/websocket"
@@ -45,21 +46,12 @@ func wsReader(ws *websocket.Conn) {
 		}
 		switch msgT {
 		case websocket.BinaryMessage:
-			filename := func() string {
-				str := ""
-				for _, v := range msg[:512] {
-					if v == 0 {
-						break
-					}
-					str += string(v)
-				}
-				return str
-			}()
-			err := ioutil.WriteFile("../out/"+filename, msg[512:], 0644)
+			file := srmodel.ReadFile(msg)
+			err := ioutil.WriteFile("../out/"+file.FileName, file.FileData, 0644)
 			if err != nil {
 				logrus.Errorln(err)
 			}
-			logrus.Printf("received file: %s", filename)
+			logrus.Printf("received file: %s", file.FileName)
 			return
 		case websocket.TextMessage:
 
